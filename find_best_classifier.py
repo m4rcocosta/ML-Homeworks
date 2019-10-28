@@ -45,10 +45,12 @@ def read_data():
 
 #split dataset
 def split_dataset(classifier_type, instruction_type):
+    target = ""
     if classifier_type == "Binary":
-        x_train, x_test, y_train, y_test = train_test_split(data[instruction_type], data["opt"], test_size = 0.20)
+        target = "opt"
     else:
-        x_train, x_test, y_train, y_test = train_test_split(data[instruction_type], data["compiler"], test_size = 0.20)
+        target = "compiler"
+    x_train, x_test, y_train, y_test = train_test_split(data[instruction_type], data[target], test_size = 0.20)
     encoder = preprocessing.LabelEncoder()
     y_train = encoder.fit_transform(y_train)
     y_test = encoder.fit_transform(y_test)
@@ -99,7 +101,6 @@ def classify(x_train_count, x_test_count, vectorizer, instruction_type, classifi
         print("F1 Score:", file = result_file)
         print(f1_score(y_test, y_pred, average="macro"), file = result_file)
         print("-"*50, file = result_file)
-        print("")
 
 #Read data
 data = read_data()
