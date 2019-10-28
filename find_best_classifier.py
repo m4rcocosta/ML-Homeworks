@@ -3,7 +3,6 @@ import sys
 from os.path import join
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -14,8 +13,8 @@ from sklearn import preprocessing
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import cross_val_score
 
-path = "./train_dataset.jsonl"
-result_file = open("result.txt", "a")
+path = "./dataset/train_dataset.jsonl"
+result_file = open("scores.txt", "a")
 
 # Read data
 def read_data():
