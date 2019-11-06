@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import preprocessing
 from sklearn.svm import SVC
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import cross_val_score
 
@@ -102,8 +101,7 @@ classifier_types = ["Binary", "Multiclass"]
 tfidt_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'([^,]+)',  ngram_range=(3,3))
 tfidt_vect_ngram.fit(train_dataset["instructions"])
 
-#svc = SVC(kernel="rbf", gamma="scale")
-svc = MultinomialNB()
+svc = SVC(kernel="rbf", gamma="scale")
 
 for classifier_type in classifier_types:
     #Split dataset
@@ -113,4 +111,27 @@ for classifier_type in classifier_types:
     x_to_predict = tfidt_vect_ngram.transform(test_dataset["instructions"])
     classify(x_train_count, y_train, x_to_predict, svc, classifier_type, encoder)
 
-print(result)
+print("Writing scv file...")
+low_count = 0
+high_count = 0
+gcc_count = 0
+icc_count = 0
+clang_count = 0
+predictions_file = open("predictions.csv", "w")
+for i in range(len(result["Binary"])):
+    print(result["Multiclass"][i] + "," + result["Binary"][i], file = predictions_file)
+    if result["Binary"][i] == "L":
+        low_count += 1
+    else:
+        high_count += 1
+    if result["Multiclass"][i] == "gcc":
+        gcc_count += 1
+    elif result["Multiclass"][i] == "icc":
+        icc_count += 1
+    else:
+        clang_count += 1
+predictions_file.close()
+print("Binary classification result:")
+print("L: " + str(low_count) + ", H: " + str(high_count))
+print("Multiclass classification result:")
+print("gcc: " + str(gcc_count) + ", icc: " + str(icc_count) + ", clang: " + str(clang_count))

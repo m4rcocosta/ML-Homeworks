@@ -5,11 +5,11 @@
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[italian]{babel}
+\usepackage[USenglish,british,american,australian,english]{babel}
 \usepackage{hyperref}
 \linespread{1.3}
 
-\title{\textbf{Compiler provenance} \\ \bigskip \large Homework 1 - Machine Learning \\ Engineering in Computer Science \\ "La Sapienza" University of Rome}
+\title{\textbf{Compiler Provenance} \\ \bigskip \large Homework 1 - Machine Learning \\ Engineering in Computer Science \\ "La Sapienza" University of Rome}
 \author{Costa Marco 1691388}
 \date{\today}
 
@@ -20,7 +20,20 @@
 \pagebreak
 
 \section{Introduction}
-The purpose of this homework is to apply machine learning algorithms to malware analysis. This report
-discusses some methods to detect a malware and which family it belongs to. The DREBIN dataset was used for the experiment.
+The purpose of this homework is to apply machine learning algorithms to solve the compiler provenance problem.
+It consists of identifying the \textbf{compiler} and the \textbf{optimization} who produced a given binary code of a function.
+So we have two types of classification problems:
+\begin{itemize}
+	\item \textbf{Binary classification}: optimization can be \textit{HIGH (H)} or \textit{LOW (L)}
+	\item \textbf{Multi-class classification}: compiler can be \textit{gcc}, \textit{icc} or \textit{clang}
+\end{itemize}
+
+\section{Dataset}
+
+\section{Find best classifier}
+
+\section{Predictions}
+
+\section{Conclusions}
 
 \end{document}
