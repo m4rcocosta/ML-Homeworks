@@ -66,7 +66,7 @@ def split_dataset(classifier_type, instruction_type):
     return x_train, x_test, y_train, y_test
 
 #classify
-def classify(x_train_count, x_test_count, vectorizer, instruction_type, classifier_type):
+def classify(x_train_count, x_test_count, y_train, y_test, vectorizer, instruction_type, classifier_type):
     for classifier in classifiers:
         print("="*50, file = result_file)
         print("Classifier:",type(classifier).__name__,"[Vectorizer: " + vectorizer +"], [Instruction type: " + instruction_type +"], [Classifier type: " + classifier_type + "]", file = result_file)
@@ -128,6 +128,6 @@ for classifier_type in classifier_types:
             name = type(vectorizer).__name__
             if vectorizer == tfidt_vect_ngram:
                 name += " Ngmam Range"
-            classify(x_train_count, x_test_count, name, instruction_type, classifier_type)
+            classify(x_train_count, x_test_count, y_train, y_test, name, instruction_type, classifier_type)
 
 result_file.close()
