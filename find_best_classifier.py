@@ -13,14 +13,14 @@ from sklearn import preprocessing
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.model_selection import cross_val_score
 
-path = "./dataset/train_dataset.jsonl"
+train_dataset_path = "./dataset/train_dataset.jsonl"
 result_file = open("scores.txt", "a")
 
 # Read data
 def read_data():
     print("Reading data ...")
     dataset = []
-    with open(path, 'r') as json_file:
+    with open(train_dataset_path, 'r') as json_file:
         json_list = list(json_file)
 
     for json_str in json_list:
