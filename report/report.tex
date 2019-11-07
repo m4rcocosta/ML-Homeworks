@@ -7,7 +7,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[USenglish,british,american,australian,english]{babel}
 \usepackage{hyperref}
-\linespread{1.3}
+\usepackage{amsmath}
 
 \title{\textbf{Compiler Provenance} \\ \bigskip \large Homework 1 - Machine Learning \\ Engineering in Computer Science \\ "La Sapienza" University of Rome}
 \author{Costa Marco 1691388}
@@ -29,11 +29,61 @@ So we have two types of classification problems:
 \end{itemize}
 
 \section{Dataset}
+The dataset contains 30000 functions
+compiled with 3 different compilers (\textit{gcc}, \textit{icc}, \textit{clang}).
+The compiler distribution is very balanced
+(10000 functions per compiler), while the optimizations distribution is not balanced. For each compiler different versions were used.
+The Dataset is provided as a jsonl file.
+Each row of the file is a json object with the
+following keys:
+\begin{itemize}
+\item \textbf{instructions}: the assembly instruction for the
+function.
+\item \textbf{opt}: the ground truth label for optimization (\textit{H}, \textit{L})
+\item \textbf{compiler}: the ground truth label for compiler (\textit{icc},
+\textit{clang}, \textit{gcc})
+\end{itemize}
+Moreover, there is a blind test set, which does not contain the label for the function. The goal is to classify the functions of this dataset after training the algorithm on the previous set.
 
 \section{Find best classifier}
+To find the algorithm that best solves the problem I decided to analyze several cases, using different types of features, classifiers and vectorizers.
+
+\subsection{Feature}
+I decided to use the Bag-of-Words approach. It consists in:
+\begin{itemize}
+	\item Splitting the documents into tokens by following some sort of pattern. In this case, for each function there is a string composed of instructions separated by a comma, so it's possible to split it on the comma.
+	\item Assigning a weight to each token proportional to the frequency with which it shows up in the document and/or corpora.
+	\item Creating a document-term matrix with each row representing a document and each column addressing a token.
+\end{itemize}
+I used two types of different approaches. The first consists of using only the mnemonics instructions, while the second using all the complete instructions.
+
+\subsection{Vectorizer}
+I used two vectorizer objects provided by Scikit-Learn. They allow us to perform all the above steps at once efficiently, and even apply preprocessing and rules regarding the number and frequency of tokens.
+
+\begin{itemize}
+	\item \textbf{Count Vectorizer}: It counts the number of times a token shows up in the document and uses this value as its weight.
+	\item \textbf{TF-IDF Vectorizer}: TF-IDF stands for “term frequency-inverse document frequency”, meaning the weight assigned to each token not only depends on its frequency in a document but also how recurrent that term is in the entire corpora.
+\end{itemize}
+
+Since the order of the instructions is important, I also used the vectorizers with the ngram\_range parameter, setting it once to (3,3) and once to (4,4)
+
+\subsection{Classifier}
+\begin{itemize}
+	\item \textbf{Logistic Regression}
+	\item \textbf{Multinomial Naive Bayes}
+	\item \textbf{Decision Tree}
+	\item \textbf{SVC}
+	\item \textbf{K-Neighbors}
+	\item \textbf{Random Forest}
+\end{itemize}
+
+\subsection{Result}
+
 
 \section{Predictions}
 
+
 \section{Conclusions}
+
 
 \end{document}
