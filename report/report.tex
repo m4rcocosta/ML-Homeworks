@@ -8,6 +8,24 @@
 \usepackage[USenglish,british,american,australian,english]{babel}
 \usepackage{hyperref}
 \usepackage{amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{%
+	basicstyle=\fontsize{10}{11}\ttfamily\color{black},
+	commentstyle=\ttfamily\color{red},
+	keywordstyle=\ttfamily\color{blue},
+	stringstyle=\color{orange},
+	tabsize=2,
+	numbers=left,
+	numberstyle=\tiny,
+	firstnumber=1,
+	numberfirstline=false,
+	frame=single,
+	showstringspaces=false,
+	inputencoding=utf8,
+	breaklines=true,
+	language=python, % linguaggio usato
+}
 
 \title{\textbf{Compiler Provenance} \\ \bigskip \large Homework 1 - Machine Learning \\ Engineering in Computer Science \\ "La Sapienza" University of Rome}
 \author{Costa Marco 1691388}
@@ -45,6 +63,34 @@ function.
 \end{itemize}
 Moreover, there is a blind test set, which does not contain the label for the function. The goal is to classify the functions of this dataset after training the algorithm on the previous set.
 
+\subsection{Read the dataset}
+\begin{lstlisting}
+def read_data():
+	print("Reading data ...")
+	dataset = []
+	with open(train_dataset_path, 'r') as json_file:
+		json_list = list(json_file)
+
+	for json_str in json_list:
+		result = json.loads(json_str)
+		instructions = result["instructions"]
+		instr = []
+		mnemonics = []
+		for instruction in instructions:
+		instr.append(instruction)
+		mnemonics.append(instruction.split(" ")[0])
+		result["instructions"] = ",".join(instr)
+		result["mnemonics"] = ",".join(mnemonics)
+	dataset.append(result)
+
+	data = pd.DataFrame(dataset)
+	print("Data read successfully!")
+	print("-"*50)
+	print(data.shape)
+	print("-"*50)
+	return data
+\end{lstlisting}
+
 \section{Find best classifier}
 To find the algorithm that best solves the problem I decided to analyze several cases, using different types of features, classifiers and vectorizers.
 
@@ -55,7 +101,7 @@ I decided to use the Bag-of-Words approach. It consists in:
 	\item Assigning a weight to each token proportional to the frequency with which it shows up in the document and/or corpora.
 	\item Creating a document-term matrix with each row representing a document and each column addressing a token.
 \end{itemize}
-I used two types of different approaches. The first consists of using only the mnemonics instructions, while the second using all the complete instructions.
+I used two types of different approaches. The first consists of using only the mnemonics instructions (as suggested in the paper), while the second using all the complete instructions.
 
 \subsection{Vectorizer}
 I used two vectorizer objects provided by Scikit-Learn. They allow us to perform all the above steps at once efficiently, and even apply preprocessing and rules regarding the number and frequency of tokens.
