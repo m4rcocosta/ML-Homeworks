@@ -194,9 +194,41 @@ Two scripts have been implemented in Python 3. The first allows you to test diff
 \begin{itemize}
 	\item \textbf{\textit{find\_best\_classifier.py}}: python3 find\_best\_classifier.py classification\_type instruction\_type
 	\item \textbf{\textit{predict.py}}: \textit{python3 predict.py opt\_instruction\_type opt\_classifier opt\_vectorizer comp\_instruction\_type comp\_classifier comp\_vectorizer}
-\end{itemize} 
+\end{itemize}
+You need to specify some parameters:
+\begin{itemize}
+	\item \textit{classification\_type}: "Optimization"/"Compiler", to choose whether to classify by optimization or by compiler 
+	\item \textit{instruction\_type}: "mnemonics"/"instructions", to choose whether to use only mnemonic or complete instructions
+	\item \textit{opt\_instructions}: "mnemonics"/"instructions", to choose whether to use only mnemonic or complete instructions for the optimization classification
+	\item \textit{opt\_classifier}: an integer between 0 and 5, to choose the classifier for the optimization classification
+	\item \textit{opt\_vectorizer}: an integer between 0 and 5, to choose the vectorizer for the optimization classification
+	\item \textit{comp\_instructions}: "mnemonics"/"instructions", to choose whether to use only mnemonic or complete instructions for the compiler classification
+	\item \textit{comp\_classifier}: an integer between 0 and 5, to choose the classifier for the compiler classification
+	\item \textit{comp\_vectorizer}: an integer between 0 and 5, to choose the vectorizer for the compiler classification
+\end{itemize}
+
+The possible classifiers are:
+\begin{itemize}
+	\item \textit{0} - Logistic Regression
+	\item \textit{1} - Multinomial NB
+	\item \textit{2} - Decision Tree
+	\item \textit{3} - SVC
+	\item \textit{4} - K-Neighbors
+	\item \textit{5} - Random Forest
+\end{itemize}
+
+The possible vectorizers are:
+\begin{itemize}
+	\item \textit{0} - Count vectorizer
+	\item \textit{1} - Tfidf vectorizer
+	\item \textit{2} - Count vectorizer with ngram\_range=(3,3)
+	\item \textit{3} - Tfidf vectorizer with ngram\_range=(3,3)
+	\item \textit{4} - Count vectorizer with ngram\_range=(4,4)
+	\item \textit{5} - Tfidf vectorizer with ngram\_range=(4,4)
+\end{itemize}
 
 \subsection{Code explanation}
+Let's analyze some important functions.\\ \\
 \textbf{Read the dataset}:
 \begin{lstlisting}
 def read_data():
@@ -224,8 +256,66 @@ def read_data():
 	print("-"*50)
 	return data
 \end{lstlisting}
+This function allows you to read the dataset in jsonl format. Once opened, the instructions of each function of the dataset are manipulated in order to obtain two strings (one for the mnemonic instructions and one for the complete instructions. The whole is returned as a pandas dataframe. \\
+
+\textbf{Split the dataset}:
+\begin{lstlisting}
+def split_dataset(classifier_type, instruction_type):
+	target = ""
+	if classifier_type == "Optimization":
+		target = "opt"
+	else:
+		target = "compiler"
+	x_train, x_test, y_train, y_test = train_test_split(data[instruction_type], data[target], test_size = 0.20)
+	encoder = preprocessing.LabelEncoder()
+	y_train = encoder.fit_transform(y_train)
+	y_test = encoder.fit_transform(y_test)
+	return x_train, x_test, y_train, y_test
+\end{lstlisting}
+This function allows you to divide the dataset according to the type of classification required (Optimization or Compiler). 80\% of the dataset is used for model training and 20\% for testing. In addition, the target is encoded. \\
+
+\textbf{Classify}:
+\begin{lstlisting}
+def classify(x_train_count, x_test_count, y_train, y_test, vectorizer, instruction_type, classifier_type):
+	for classifier in classifiers:
+		print("="*50, file = score_file)
+		print("Classifier:",type(classifier).__name__,"[Vectorizer: " + vectorizer +"], [Instruction type: " + instruction_type +"], [Classifier type: " + classifier_type + "]", file = score_file)
+		print("="*50, file = score_file)
+		print("Fitting",type(classifier).__name__,"[Vectorizer: " + vectorizer +"], [Instruction type: " + instruction_type +"], [Classifier type: " + classifier_type + "]")
+		classifier.fit(x_train_count, y_train)
+		print("-"*50)
+		print("Predicting",type(classifier).__name__,"[Vectorizer: " + vectorizer +"], [Instruction type: " + instruction_type +"], [Classifier type: " + classifier_type + "]")
+		y_pred = classifier.predict(x_test_count)
+		print("-"*50)
+		print("Result:", file = score_file)
+		print("-"*50, file = score_file)
+		print("Confusion Matrix:", file = score_file)
+		print(confusion_matrix(y_test, y_pred), file = score_file)
+		print("-"*50, file = score_file)
+		print("Classification Report:", file = score_file)
+		print(classification_report(y_test, y_pred), file = score_file)
+		print("-"*50, file = score_file)
+		print("Accuracy:", file = score_file)
+		print(accuracy_score(y_test, y_pred), file = score_file)
+		print("-"*50, file = score_file)
+		print("Precision:", file = score_file)
+		print(precision_score(y_test, y_pred, average="macro"), file = score_file)
+		print("-"*50, file = score_file)
+		print("Recall:", file = score_file)
+		print(recall_score(y_test, y_pred, average="macro"), file = score_file)
+		print("-"*50, file = score_file)
+		print("Performing Cross Validation Score",type(classifier).__name__,"[Vectorizer: " + vectorizer +"], [Instruction type: " + instruction_type +"], [Classifier type: " + classifier_type + "]")
+		print("Cross Validation Score:", file = score_file)
+		print(cross_val_score(classifier, x_test_count, y_test, cv = 10, n_jobs = -1), file = score_file)
+		print("-"*50)
+		print("-"*50, file = score_file)
+		print("F1 Score:", file = score_file)
+		print(f1_score(y_test, y_pred, average="macro"), file = score_file)
+		print("-"*50, file = score_file)
+\end{lstlisting}
+This last function allows you to train and test the six models used for this experiment. After obtaining the various parameters for each model, these are written into a \textit{file.txt}, so that they can be analyzed.
 
 \section{Conclusions}
-
+From the results obtained it is possible to conclude that \textit{SVC} is the classifier that performs better to solve the compiler provenance problem, both in the case of the mnemonic instructions and in the case of the complete instructions. In addition, it can be noted that considering the complete instructions does not significantly improve the results, so it is advisable to always use the mnemonic instructions. Another consideration is that the order in which the instructions appear is important, and in general consider blocks of 3 instructions to be more successful than considering blocks of 4 instructions.
 
 \end{document}
