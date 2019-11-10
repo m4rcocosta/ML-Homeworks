@@ -185,6 +185,7 @@ Results:
 	\item \textbf{Compiler classification}: 975 functions compiled with \textbf{\textit{gcc}}, 1013 functions compiled with \textbf{\textit{icc}}, 1012 functions compiled with \textbf{\textit{clang}}
 \end{itemize}
 We can say that the compiler distribution is balanced, while the second is not (as in the train dataset). \\
+\textit{SVC} was trained on the 80\% of the train dataset, because the results to find the best classifier were obtained in this way.. \\
 A csv file is also attached, in which for each instruction the prediction of the compiler and the optimization is given.
 
 \section{Code}
@@ -317,7 +318,7 @@ This last function allows you to train and test the six models used for this exp
 
 \section{Conclusions}
 From the results obtained it is possible to conclude that \textit{SVC} is the classifier that performs better to solve the compiler provenance problem, both in the case of the mnemonic instructions and in the case of the complete instructions. In addition, it can be noted that considering the complete instructions does not significantly improve the results, so it is advisable to always use the mnemonic instructions. Another consideration is that the order in which the instructions appear is important, and in general consider blocks of 3 instructions to be more successful than considering blocks of 4 instructions. \\
-However, \textit{SVC} is much slower. You can see that \textit{Logistic Regression} has slightly lower results($\sim$0.86 of accuracy  for optimization classification and $\sim$0.88 for compiler classification, the same for precision, recall and F1 score), but it is performed in a much shorter time (\textit{SVC}) cannot be run in multi-threaded mode. Running the \textit{predict.py} script using the \textit{Logistic Regression}, we obtain the following results which are very similar to those obtained with \textit{SVC}:
+However, \textit{SVC} is much slower. You can see that \textit{Logistic Regression} has slightly lower results($\sim$0.86 of accuracy  for optimization classification and $\sim$0.88 for compiler classification, the same for precision, recall and F1 score), but it is performed in a much shorter time (\textit{SVC} cannot be run in multi-threaded mode). Running the \textit{predict.py} script using the \textit{Logistic Regression}, we obtain the following results which are very similar to those obtained with \textit{SVC}:
 \begin{itemize}
 	\item \textbf{Optimization classification}: 1783 functions with \textbf{\textit{L}} optimization, 1217 functions with \textbf{\textit{H}} optimization
 	\item \textbf{Compiler classification}: 972 functions compiled with \textbf{\textit{gcc}}, 1031 functions compiled with \textbf{\textit{icc}}, 997 functions compiled with \textbf{\textit{clang}}
