@@ -108,7 +108,7 @@ Different classifiers were used:
 \end{itemize}
 
 \subsection{Result}
-Using the \textbf{\textit{mnemonic instructions}} as feature, I had that the \textit{SVC} classifier performed better both for optimization and compiler classification, using the \textit{Tfidf vectorizer with ngram range (3,3)}
+Using the \textbf{\textit{mnemonic instructions}} as feature, the \textit{SVC} classifier performed better for both optimization and compiler classification, using the \textit{Tfidf vectorizer with ngram range (3,3)}
 \begin{itemize}
 	\item \textbf{Optimization classification}: \\
 	\begin{center}
@@ -142,7 +142,7 @@ Using the \textbf{\textit{mnemonic instructions}} as feature, I had that the \te
 	\end{center}
 \end{itemize}
 
-Using the \textbf{\textit{complete instructions}}, instead, the \textit{SVC} classifier performed better with the \textit{Tfidf} vectorizer without the \textit{ngram\_range}
+Using the \textbf{\textit{complete instructions}}, instead, the \textit{SVC} classifier performed better with the \textit{Tfidf} vectorizer without the \textit{ngram\_range} for both optimization and compiler classification.
 \begin{itemize}
 	\item \textbf{Optimization classification}: \\
 	\begin{center}
@@ -162,21 +162,23 @@ Using the \textbf{\textit{complete instructions}}, instead, the \textit{SVC} cla
 	\item \textbf{Compiler classification}: \\
 	\begin{center}
 		\textbf{\textit{Confusion matrix}} $= \begin{bmatrix}
-		
+		1832 & 77 & 71 \\
+		125 & 1822 & 65 \\
+		82 & 66 & 1860
 		\end{bmatrix}$\\
-		\textbf{\textit{Accuracy}} $= $\\
-		\textbf{\textit{Precision}} $= $\\
-		\textbf{\textit{Recall}} $= $\\
+		\textbf{\textit{Accuracy}} $= 0.919$\\
+		\textbf{\textit{Precision}} $= 0.919$\\
+		\textbf{\textit{Recall}} $= 0.919$\\
 		\textbf{\textit{Cross validation}} $= \begin{bmatrix}
-		
+		0.872 & 0.857 & 0.863 & 0.842 & 0.857 & 0.87 & 0.873 & 0.86 & 0.86 & 0.906
 		\end{bmatrix}$\\
-		\textbf{\textit{F1 score}} $= $
+		\textbf{\textit{F1 score}} $= 0.919$
 	\end{center}
 \end{itemize}
 Previous results are the best results obtained. For completeness, the results of all the cases tested are attached in the "\textit{scores}" folder.
 
 \section{Predictions}
-From the tests carried out it can be seen that the best classifier is \textit{SVC} with the \textit{mnemonic instructions} and the \textit{Tfidf} vectorizer with \textit{ngram\_range = (3,3)}  for both the classification of the optimization and the compiler. \\
+From the tests carried out it can be seen that the best classifier is \textit{SVC} with the \textit{mnemonic instructions} and the \textit{Tfidf} vectorizer with \textit{ngram\_range = (3,3)}  for the optimization classification, while \textit{SVC} with the \textit{complete instructions} without \textit{ngram\_range} for the compiler classification. Since the difference between the use of mnemonic and complete instructions is not so great in the compiler classification, for simplicity the prediction on the \textit{blind test set} has been made using the mnemonic instructions. \\
 Results:
 \begin{itemize}
 	\item \textbf{Optimization classification}: 1793 functions with \textbf{\textit{L}} optimization, 1207 functions with \textbf{\textit{H}} optimization
