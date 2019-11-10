@@ -1,5 +1,5 @@
 ==================================================
-Classifier: LogisticRegression [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: LogisticRegression [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -37,7 +37,7 @@ F1 Score:
 0.7048183820037867
 --------------------------------------------------
 ==================================================
-Classifier: MultinomialNB [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: MultinomialNB [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -75,7 +75,7 @@ F1 Score:
 0.5759276400542609
 --------------------------------------------------
 ==================================================
-Classifier: DecisionTreeClassifier [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: DecisionTreeClassifier [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -113,7 +113,7 @@ F1 Score:
 0.7421197119260702
 --------------------------------------------------
 ==================================================
-Classifier: SVC [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: SVC [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -151,7 +151,7 @@ F1 Score:
 0.4918911343251288
 --------------------------------------------------
 ==================================================
-Classifier: KNeighborsClassifier [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: KNeighborsClassifier [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -189,7 +189,7 @@ F1 Score:
 0.6138699216288777
 --------------------------------------------------
 ==================================================
-Classifier: RandomForestClassifier [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: RandomForestClassifier [Vectorizer: CountVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -227,7 +227,7 @@ F1 Score:
 0.8361939373542312
 --------------------------------------------------
 ==================================================
-Classifier: LogisticRegression [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: LogisticRegression [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -265,7 +265,7 @@ F1 Score:
 0.6957104089611037
 --------------------------------------------------
 ==================================================
-Classifier: MultinomialNB [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: MultinomialNB [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -303,7 +303,7 @@ F1 Score:
 0.6352403156088854
 --------------------------------------------------
 ==================================================
-Classifier: DecisionTreeClassifier [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: DecisionTreeClassifier [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -341,7 +341,7 @@ F1 Score:
 0.7384982815198899
 --------------------------------------------------
 ==================================================
-Classifier: SVC [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: SVC [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -379,7 +379,7 @@ F1 Score:
 0.7659988172505111
 --------------------------------------------------
 ==================================================
-Classifier: KNeighborsClassifier [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: KNeighborsClassifier [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -417,7 +417,7 @@ F1 Score:
 0.7160642202078668
 --------------------------------------------------
 ==================================================
-Classifier: RandomForestClassifier [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: RandomForestClassifier [Vectorizer: TfidfVectorizer], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -455,7 +455,7 @@ F1 Score:
 0.8376092312574407
 --------------------------------------------------
 ==================================================
-Classifier: LogisticRegression [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: LogisticRegression [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -493,7 +493,7 @@ F1 Score:
 0.8857165007297633
 --------------------------------------------------
 ==================================================
-Classifier: MultinomialNB [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: MultinomialNB [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -531,7 +531,7 @@ F1 Score:
 0.8444047947649324
 --------------------------------------------------
 ==================================================
-Classifier: DecisionTreeClassifier [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: DecisionTreeClassifier [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -569,7 +569,7 @@ F1 Score:
 0.7905087781497082
 --------------------------------------------------
 ==================================================
-Classifier: SVC [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: SVC [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -607,7 +607,7 @@ F1 Score:
 0.650951113014327
 --------------------------------------------------
 ==================================================
-Classifier: KNeighborsClassifier [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: KNeighborsClassifier [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -645,7 +645,7 @@ F1 Score:
 0.6321703572192477
 --------------------------------------------------
 ==================================================
-Classifier: RandomForestClassifier [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: RandomForestClassifier [Vectorizer: CountVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -683,7 +683,7 @@ F1 Score:
 0.8857628613855141
 --------------------------------------------------
 ==================================================
-Classifier: LogisticRegression [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: LogisticRegression [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -721,7 +721,7 @@ F1 Score:
 0.8795519255416019
 --------------------------------------------------
 ==================================================
-Classifier: MultinomialNB [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: MultinomialNB [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -759,7 +759,7 @@ F1 Score:
 0.8754119469131366
 --------------------------------------------------
 ==================================================
-Classifier: DecisionTreeClassifier [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: DecisionTreeClassifier [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -797,7 +797,7 @@ F1 Score:
 0.7717860095554596
 --------------------------------------------------
 ==================================================
-Classifier: SVC [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: SVC [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -835,7 +835,7 @@ F1 Score:
 0.9044229573748869
 --------------------------------------------------
 ==================================================
-Classifier: KNeighborsClassifier [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: KNeighborsClassifier [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -873,7 +873,7 @@ F1 Score:
 0.674658562568899
 --------------------------------------------------
 ==================================================
-Classifier: RandomForestClassifier [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: RandomForestClassifier [Vectorizer: TfidfVectorizer Ngram Range 3], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -911,7 +911,7 @@ F1 Score:
 0.8905881423258096
 --------------------------------------------------
 ==================================================
-Classifier: LogisticRegression [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: LogisticRegression [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -949,7 +949,7 @@ F1 Score:
 0.8789502929884826
 --------------------------------------------------
 ==================================================
-Classifier: MultinomialNB [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: MultinomialNB [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -987,7 +987,7 @@ F1 Score:
 0.8754211586000914
 --------------------------------------------------
 ==================================================
-Classifier: DecisionTreeClassifier [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: DecisionTreeClassifier [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1025,7 +1025,7 @@ F1 Score:
 0.7670941836148302
 --------------------------------------------------
 ==================================================
-Classifier: SVC [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: SVC [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1063,7 +1063,7 @@ F1 Score:
 0.6487048388465385
 --------------------------------------------------
 ==================================================
-Classifier: KNeighborsClassifier [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: KNeighborsClassifier [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1101,7 +1101,7 @@ F1 Score:
 0.6159972139192337
 --------------------------------------------------
 ==================================================
-Classifier: RandomForestClassifier [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: RandomForestClassifier [Vectorizer: CountVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1139,7 +1139,7 @@ F1 Score:
 0.8696323463096038
 --------------------------------------------------
 ==================================================
-Classifier: LogisticRegression [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: LogisticRegression [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1177,7 +1177,7 @@ F1 Score:
 0.8856235417377999
 --------------------------------------------------
 ==================================================
-Classifier: MultinomialNB [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: MultinomialNB [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1215,7 +1215,7 @@ F1 Score:
 0.887904267320629
 --------------------------------------------------
 ==================================================
-Classifier: DecisionTreeClassifier [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: DecisionTreeClassifier [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1253,7 +1253,7 @@ F1 Score:
 0.7466921578579996
 --------------------------------------------------
 ==================================================
-Classifier: SVC [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: SVC [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1291,7 +1291,7 @@ F1 Score:
 0.8943299610226799
 --------------------------------------------------
 ==================================================
-Classifier: KNeighborsClassifier [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: KNeighborsClassifier [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------
@@ -1329,7 +1329,7 @@ F1 Score:
 0.5969199239125987
 --------------------------------------------------
 ==================================================
-Classifier: RandomForestClassifier [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Multiclass]
+Classifier: RandomForestClassifier [Vectorizer: TfidfVectorizer Ngram Range 4], [Instruction type: mnemonics], [Classifier type: Compiler]
 ==================================================
 Result:
 --------------------------------------------------

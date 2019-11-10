@@ -46,7 +46,7 @@ def read_data():
 # Split dataset
 def split_dataset(classifier_type, instruction_type):
     target = ""
-    if classifier_type == "Binary":
+    if classifier_type == "Optimization":
         target = "opt"
     else:
         target = "compiler"
@@ -96,7 +96,7 @@ def classify(x_train_count, x_test_count, y_train, y_test, vectorizer, instructi
 
 
 # Classifiers
-classifier_types = ["Binary", "Multiclass"]
+classifier_types = ["Optimization", "Compiler"]
 classifiers = [LogisticRegression(random_state=0, solver="lbfgs", multi_class="auto", max_iter=5000, n_jobs=-1), MultinomialNB(), DecisionTreeClassifier(random_state=0), SVC(kernel="rbf", gamma="scale"), KNeighborsClassifier(n_neighbors=3, n_jobs=-1), RandomForestClassifier(n_estimators=100, n_jobs=-1)]
 
 # Vectorizers
@@ -106,36 +106,37 @@ vectorizers = [CountVectorizer(input="content", encoding="utf-8", tokenizer=lamb
 instruction_types = ["mnemonics", "instructions"]
 
 # Main
-if len(sys.argv) < 3:
-    print("Bad usage! You must specify the classifier type (Binary/Multiclass) and the instruction type (mnemonics/instructions).")
-    exit(1)
-classifier_type = sys.argv[1]
-instruction_type = sys.argv[2]
-if classifier_type not in classifier_types:
-    print("Bad usage! Classifier type must be 'Binary' or 'Multiclass'.")
-    exit(1)
-if instruction_type not in instruction_types:
-    print("Bad usage! Instruction type must be 'mnemonics' or 'instructions'.")
-    exit(1)
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Bad usage! You must specify the classifier type (Optimization/Compiler) and the instruction type (mnemonics/instructions).")
+        exit(1)
+    classifier_type = sys.argv[1]
+    instruction_type = sys.argv[2]
+    if classifier_type not in classifier_types:
+        print("Bad usage! Classifier type must be 'Optimization' or 'Compiler'.")
+        exit(1)
+    if instruction_type not in instruction_types:
+        print("Bad usage! Instruction type must be 'mnemonics' or 'instructions'.")
+        exit(1)
 
-# Read data
-data = read_data()
-print(data)
-print()
+    # Read data
+    data = read_data()
+    print(data)
+    print()
 
-score_file = open("./scores/" + classifier_type + "_" + instruction_type + "_scores.txt", "w")
+    score_file = open("./scores/" + classifier_type + "_" + instruction_type + "_scores.txt", "w")
 
-# Split dataset
-x_train, x_test, y_train, y_test = split_dataset(classifier_type, instruction_type)
-for vectorizer in vectorizers:
-    vectorizer.fit(data[instruction_type])
-    x_train_count = vectorizer.transform(x_train)
-    x_test_count = vectorizer.transform(x_test)
-    name = type(vectorizer).__name__
-    if vectorizer == vectorizers[2] or vectorizer == vectorizers[3]:
-        name += " Ngram Range 3"
-    elif vectorizer == vectorizers[4] or vectorizer == vectorizers[5]:
-        name += " Ngram Range 4"
-    classify(x_train_count, x_test_count, y_train, y_test, name, instruction_type, classifier_type)
+    # Split dataset
+    x_train, x_test, y_train, y_test = split_dataset(classifier_type, instruction_type)
+    for vectorizer in vectorizers:
+        vectorizer.fit(data[instruction_type])
+        x_train_count = vectorizer.transform(x_train)
+        x_test_count = vectorizer.transform(x_test)
+        name = type(vectorizer).__name__
+        if vectorizer == vectorizers[2] or vectorizer == vectorizers[3]:
+            name += " Ngram Range 3"
+        elif vectorizer == vectorizers[4] or vectorizer == vectorizers[5]:
+            name += " Ngram Range 4"
+        classify(x_train_count, x_test_count, y_train, y_test, name, instruction_type, classifier_type)
 
-score_file.close()
+    score_file.close()

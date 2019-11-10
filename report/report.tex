@@ -24,7 +24,7 @@
 	showstringspaces=false,
 	inputencoding=utf8,
 	breaklines=true,
-	language=python, % linguaggio usato
+	language=python,
 }
 
 \title{\textbf{Compiler Provenance} \\ \bigskip \large Homework 1 - Machine Learning \\ Engineering in Computer Science \\ "La Sapienza" University of Rome}
@@ -63,34 +63,6 @@ function.
 \end{itemize}
 Moreover, there is a blind test set, which does not contain the label for the function. The goal is to classify the functions of this dataset after training the algorithm on the previous set.
 
-\subsection{Read the dataset}
-\begin{lstlisting}
-def read_data():
-	print("Reading data ...")
-	dataset = []
-	with open(train_dataset_path, 'r') as json_file:
-		json_list = list(json_file)
-
-	for json_str in json_list:
-		result = json.loads(json_str)
-		instructions = result["instructions"]
-		instr = []
-		mnemonics = []
-		for instruction in instructions:
-		instr.append(instruction)
-		mnemonics.append(instruction.split(" ")[0])
-		result["instructions"] = ",".join(instr)
-		result["mnemonics"] = ",".join(mnemonics)
-	dataset.append(result)
-
-	data = pd.DataFrame(dataset)
-	print("Data read successfully!")
-	print("-"*50)
-	print(data.shape)
-	print("-"*50)
-	return data
-\end{lstlisting}
-
 \section{Find best classifier}
 To find the algorithm that best solves the problem I decided to analyze several cases, using different types of features, classifiers and vectorizers.
 
@@ -101,7 +73,7 @@ I decided to use the Bag-of-Words approach. It consists in:
 	\item Assigning a weight to each token proportional to the frequency with which it shows up in the document and/or corpora.
 	\item Creating a document-term matrix with each row representing a document and each column addressing a token.
 \end{itemize}
-I used two types of different approaches. The first consists of using only the mnemonics instructions (as suggested in the paper), while the second using all the complete instructions.
+I used two types of different approaches. The first consists of using only the mnemonics instructions (as suggested in the paper), while the second using all the complete instructions. I also tried to manipulate the instructions, but that lowered the accuracy a lot.
 
 \subsection{Vectorizer}
 I used two vectorizer objects provided by Scikit-Learn. They allow us to perform all the above steps at once efficiently, and even apply preprocessing and rules regarding the number and frequency of tokens.
@@ -111,23 +83,145 @@ I used two vectorizer objects provided by Scikit-Learn. They allow us to perform
 	\item \textbf{TF-IDF Vectorizer}: TF-IDF stands for “term frequency-inverse document frequency”, meaning the weight assigned to each token not only depends on its frequency in a document but also how recurrent that term is in the entire corpora.
 \end{itemize}
 
-Since the order of the instructions is important, I also used the vectorizers with the ngram\_range parameter, setting it once to (3,3) and once to (4,4)
+Since the order of the instructions is important, I also used the vectorizers with the \textit{ngram\_range} parameter in order to look for ngram relationships at multiple scales, setting it once to (3,3) and once to (4,4)
+
+\subsection{How to choose the best classifier}
+A good model is not the one that gives accurate predictions on the known data or training data but the one which gives good predictions on the new data and avoids overfitting and underfitting. \\
+In order to choose the classifier that performs better on the dataset, it's possible to analyze and compare some parameters:
+\begin{itemize}
+	\item \textbf{Accuracy} - is the most intuitive performance measure and it is simply a ratio of correctly predicted observation to the total observations
+	\item \textbf{Precision} - is the ratio of correctly predicted positive observations to the total predicted positive observations
+	\item \textbf{Recall} - is the ratio of correctly predicted positive observations to the all observations in actual class - yes
+	\item \textbf{F1 score} - is the weighted average of Precision and Recall ($F1 Score = 2*(Recall * Precision) / (Recall + Precision)$)
+	\item \textbf{K Fold Cross Validation} - to tackle problem of overfitting it's possible to perform the \textit{Cross Validation}. It consists of partitioning the data into a number of subsets, hold out a set at a time and train the model on remaining set and test model on hold out set, repeating the process for each subset of the dataset.
+\end{itemize}
 
 \subsection{Classifier}
+Different classifiers were used:
 \begin{itemize}
 	\item \textbf{Logistic Regression}
 	\item \textbf{Multinomial Naive Bayes}
 	\item \textbf{Decision Tree}
-	\item \textbf{SVC}
+	\item \textbf{SVC} with \textit{rbf} kernel
 	\item \textbf{K-Neighbors}
 	\item \textbf{Random Forest}
 \end{itemize}
 
 \subsection{Result}
+Using the \textbf{\textit{mnemonic instructions}} as feature, I had that the \textit{SVC} classifier performed better both for optimization and compiler classification, using the \textit{Tfidf vectorizer with ngram range (3,3)}
+\begin{itemize}
+	\item \textbf{Optimization classification}: \\
+	\begin{center}
+		\textbf{\textit{Confusion matrix}} $= \begin{bmatrix}
+		2019 & 421 \\
+		337 & 3223
+		\end{bmatrix}$\\
+		\textbf{\textit{Accuracy}} $= 0.874$\\
+		\textbf{\textit{Precision}} $= 0.871$\\
+		\textbf{\textit{Recall}} $= 0.866$\\
+		\textbf{\textit{Cross validation}} $= \begin{bmatrix}
+		0.822 & 0.85 & 0.825 & 0.827 & 0.825 & 0.857 & 0.858 & 0.845 & 0.84 & 0.822
+		\end{bmatrix}$\\
+		\textbf{\textit{F1 score}} $= 0.868$
+	\end{center}
+	
+	\item \textbf{Compiler classification}: \\
+	\begin{center}
+		\textbf{\textit{Confusion matrix}} $= \begin{bmatrix}
+		1773 & 112 & 76 \\
+		114 & 1800 & 95 \\
+		107 & 69 & 1854
+		\end{bmatrix}$\\
+		\textbf{\textit{Accuracy}} $= 0.905$\\
+		\textbf{\textit{Precision}} $= 0.904$\\
+		\textbf{\textit{Recall}} $= 0.904$\\
+		\textbf{\textit{Cross validation}} $= \begin{bmatrix}
+		0.862 & 0.853 & 0.863 & 0.868 & 0.843 & 0.837 & 0.84 & 0.832 & 0.868 & 0.863
+		\end{bmatrix}$\\
+		\textbf{\textit{F1 score}} $= 0.904$
+	\end{center}
+\end{itemize}
 
+Using the \textbf{\textit{complete instructions}}, instead, the \textit{SVC} classifier performed better with the \textit{Tfidf} vectorizer without the \textit{ngram\_range}
+\begin{itemize}
+	\item \textbf{Optimization classification}: \\
+	\begin{center}
+		\textbf{\textit{Confusion matrix}} $= \begin{bmatrix}
+		1982 & 427 \\
+		445 & 3146
+		\end{bmatrix}$\\
+		\textbf{\textit{Accuracy}} $= 0.855$\\
+		\textbf{\textit{Precision}} $= 0.849$\\
+		\textbf{\textit{Recall}} $= 0.849$\\
+		\textbf{\textit{Cross validation}} $= \begin{bmatrix}
+		0.802 & 0.805 & 0.81 & 0.822 & 0.823 & 0.807 & 0.805 & 0.815 & 0.817 & 0.838
+		\end{bmatrix}$\\
+		\textbf{\textit{F1 score}} $= 0.849$
+	\end{center}
+	
+	\item \textbf{Compiler classification}: \\
+	\begin{center}
+		\textbf{\textit{Confusion matrix}} $= \begin{bmatrix}
+		
+		\end{bmatrix}$\\
+		\textbf{\textit{Accuracy}} $= $\\
+		\textbf{\textit{Precision}} $= $\\
+		\textbf{\textit{Recall}} $= $\\
+		\textbf{\textit{Cross validation}} $= \begin{bmatrix}
+		
+		\end{bmatrix}$\\
+		\textbf{\textit{F1 score}} $= $
+	\end{center}
+\end{itemize}
+Previous results are the best results obtained. For completeness, the results of all the cases tested are attached in the "\textit{scores}" folder.
 
 \section{Predictions}
+From the tests carried out it can be seen that the best classifier is \textit{SVC} with the \textit{mnemonic instructions} and the \textit{Tfidf} vectorizer with \textit{ngram\_range = (3,3)}  for both the classification of the optimization and the compiler. \\
+Results:
+\begin{itemize}
+	\item \textbf{Optimization classification}: 1793 functions with \textbf{\textit{L}} optimization, 1207 functions with \textbf{\textit{H}} optimization
+	\item \textbf{Compiler classification}: 975 functions compiled with \textbf{\textit{gcc}}, 1013 functions compiled with \textbf{\textit{icc}}, 1012 functions compiled with \textbf{\textit{clang}}
+\end{itemize}
+We can say that the compiler distribution is balanced, while the second is not (as in the train dataset). \\
+A csv file is also attached, in which for each instruction the prediction of the compiler and the optimization is given.
 
+\section{Code}
+Two scripts have been implemented in Python 3. The first allows you to test different classifiers, vectorizers and features in order to obtain useful parameters to compare the various cases and choose the best algorithm. The second one allows to classify the blind test set instructions according to the compiler (Multi-class Classification) and the optimization (Binary Classification), using the desired classifier, vectorizer and feature.
+
+\subsection{Usage}
+\begin{itemize}
+	\item \textbf{\textit{find\_best\_classifier.py}}: python3 find\_best\_classifier.py classification\_type instruction\_type
+	\item \textbf{\textit{predict.py}}: \textit{python3 predict.py opt\_instruction\_type opt\_classifier opt\_vectorizer comp\_instruction\_type comp\_classifier comp\_vectorizer}
+\end{itemize} 
+
+\subsection{Code explanation}
+\textbf{Read the dataset}:
+\begin{lstlisting}
+def read_data():
+	print("Reading data ...")
+	dataset = []
+	with open(train_dataset_path, 'r') as json_file:
+		json_list = list(json_file)
+	
+	for json_str in json_list:
+		result = json.loads(json_str)
+		instructions = result["instructions"]
+		instr = []
+		mnemonics = []
+		for instruction in instructions:
+			instr.append(instruction)
+			mnemonics.append(instruction.split(" ")[0])
+		result["instructions"] = ",".join(instr)
+		result["mnemonics"] = ",".join(mnemonics)
+	dataset.append(result)
+	
+	data = pd.DataFrame(dataset)
+	print("Data read successfully!")
+	print("-"*50)
+	print(data.shape)
+	print("-"*50)
+	return data
+\end{lstlisting}
 
 \section{Conclusions}
 
