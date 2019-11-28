@@ -1,0 +1,2 @@
+model_checkpoint_path: "weather-classification-model"
+all_model_checkpoint_paths: "weather-classification-model"
