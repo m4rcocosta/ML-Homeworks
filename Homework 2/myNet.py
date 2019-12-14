@@ -2,17 +2,17 @@ import sys, os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # only fatal errors
 import logging
 logging.getLogger('tensorflow').setLevel(logging.FATAL)
-import numpy as np
-import cv2
 import argparse
 import time
+import numpy as np
+import cv2
 import tensorflow as tf
+import matplotlib.pyplot as plt
 import keras
 from keras.preprocessing.image import ImageDataGenerator
-import matplotlib.pyplot as plt
-from keras.layers import Dense, Activation, Dropout, Flatten, Conv2D, MaxPooling2D, AveragePooling2D, GlobalAveragePooling2D, UpSampling2D
+from keras.layers import Dense, Activation, Dropout, Flatten, Conv2D, MaxPooling2D, GlobalAveragePooling2D
 from keras.layers.normalization import BatchNormalization
-from keras import regularizers, optimizers, applications, callbacks
+from keras import regularizers, optimizers, applications
 from keras.models import load_model, Model, Input, Sequential
 import sklearn.metrics 
 from sklearn.metrics import classification_report, confusion_matrix
@@ -322,92 +322,6 @@ def train(net):
     print("Time elapsed: " + str(end_time - start_time))
     saveModel(model, model_name)
     plotHistory(history, net)
-'''
-def transferLearning():
-    model_name = "transfer_weather"
-    train_generator, test_generator = loadData()
-    steps_per_epoch = train_generator.n//train_generator.batch_size
-    val_steps = test_generator.n//test_generator.batch_size + 1
-
-    start_time = time.time()
-
-    # load the pre-trained model
-    # define input tensor
-    input0 = Input(shape = train_generator.image_shape)
-
-    # load a pretrained model on imagenet without the final dense layer
-    feature_extractor = applications.vgg16.VGG16(include_top=False, weights='imagenet', input_tensor=input0)
-    
-    
-    feature_extractor = feature_extractor.output
-    feature_extractor = Model(input=input0, output=feature_extractor)
-    optimizer = 'adam' #alternative 'SGD'
-
-    feature_extractor.compile(loss=keras.losses.categorical_crossentropy, optimizer=optimizer, metrics=['accuracy'])
-    feature_extractor.summary()
-
-
-    # choose the layer from which you can get the features (block5_pool the end, glob_pooling to get the pooled version of the output)
-    name_output_extractor = "block5_pool"
-    trainable_layers = ["block5_conv3"]
-
-    # build the transfer model
-    # get the original input layer tensor
-    input_t = feature_extractor.get_layer(index=0).input
-
-    # set the feture extractor layers as non-trainable
-    for idx,layer in enumerate(feature_extractor.layers):
-        if layer.name in trainable_layers:
-            layer.trainable = True
-        else:
-            layer.trainable = False
-
-    # get the output tensor from a layer of the feature extractor
-    output_extractor = feature_extractor.get_layer(name = name_output_extractor).output
-    
-    #output_extractor = MaxPooling2D(pool_size=(4,4))(output_extractor)
-
-    # flat the output of a Conv layer
-    flatten = Flatten()(output_extractor) 
-    flatten_norm = BatchNormalization()(flatten)
-
-    # add a Dense layer
-    dense = Dropout(0.4)(flatten_norm)
-    dense = Dense(200, activation='relu')(dense)
-    dense = BatchNormalization()(dense)
-    
-    # add a Dense layer
-    dense = Dropout(0.4)(dense)
-    dense = Dense(100, activation='relu')(dense)
-    dense = BatchNormalization()(dense)
-
-    # add the final output layer
-    dense = BatchNormalization()(dense)
-    dense = Dense(train_generator.num_classes, activation='softmax')(dense)
-    
-
-    model = Model(input=input_t, output=dense, name="transferNet")
-    
-    optimizer = 'adam' #alternative 'SGD'
-    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=optimizer, metrics=['accuracy'])
-    model.summary()
-
-    # fit the transferNet on the training data
-    stopping = callbacks.EarlyStopping(monitor='val_acc', patience=3)
-
-    steps_per_epoch = train_generator.n//train_generator.batch_size
-    val_steps = test_generator.n//test_generator.batch_size+1
-
-
-    history_transfer = model.fit_generator(train_generator, epochs=50, verbose=1, callbacks=[stopping],\
-                    steps_per_epoch=steps_per_epoch,\
-                    validation_data=test_generator,\
-                    validation_steps=val_steps)
-
-    end_time = time.time()
-    print("Time elapsed: " + str(end_time - start_time))
-    plotHistory(history_transfer, "transferNet")
-    saveModel(model, model_name)'''
 
 def transferLearning():
     model_name = "transfer_weather"
