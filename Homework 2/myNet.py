@@ -24,22 +24,34 @@ config.gpu_options.allow_growth = True # dynamically grow the memory used on the
 sess = tf.compat.v1.Session(config = config)
 set_session(sess) # set this TensorFlow session as the default session for Keras
 
-trainingset = "dataset/train/"
+trainingset = "dataset/train_big/"
 testset = "dataset/test/"
 blindset = "dataset/blind/"
 models_dir = "models/"
 
+width = 224
+height = 118
+
 def loadData():
-    train_generator = train_datagen.flow_from_directory(
+    train_generator = datagen.flow_from_directory(
         directory = trainingset,
-        target_size = (118, 224),
+        target_size = (height, width),
         color_mode = "rgb",
         batch_size = batch_size,
         class_mode = "categorical",
-        shuffle = True
+        shuffle = True,
+        subset = "training"
     )
 
-    test_generator = test_datagen.flow_from_directory(directory = testset)
+    test_generator = datagen.flow_from_directory(
+        directory = trainingset,
+        target_size = (height, width),
+        color_mode = "rgb",
+        batch_size = batch_size,
+        class_mode = "categorical",
+        shuffle = True,
+        subset = "validation"
+    )
 
     num_samples = train_generator.n
     num_classes = train_generator.num_classes
@@ -52,6 +64,18 @@ def loadData():
 
     print("Loaded %d training samples from %d classes." % (num_samples, num_classes))
     print("Loaded %d test samples from %d classes." % (test_generator.n, test_generator.num_classes))
+
+    """##Show *n* random images"""
+    n = 3
+    x,y = train_generator.next()
+    # x,y size is train_generator.batch_size
+
+    for i in range(0,n):
+        image = x[i]
+        label = y[i].argmax()  # categorical from one-hot-encoding
+        print(classnames[label])
+        plt.imshow(image)
+        plt.show()
 
     return (train_generator, test_generator)
 
@@ -111,7 +135,7 @@ def plotHistory(history, name):
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig(name + '_accuracy.png')
+    plt.savefig("images/" + name + '_accuracy.png')
     # summarize history for loss
     plt.figure()
     plt.plot(history.history['loss'])
@@ -120,7 +144,7 @@ def plotHistory(history, name):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig(name + '_loss.png')
+    plt.savefig("images/" + name + '_loss.png')
 
 def myNet(input_shape, num_classes):
     model = Sequential()
@@ -149,23 +173,57 @@ def myNet(input_shape, num_classes):
     return model
 
 def myNet2(input_shape, num_classes):
-	model = Sequential()
-	model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=input_shape))
-	model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-	model.add(MaxPooling2D((2, 2)))
-	model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-	model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-	model.add(MaxPooling2D((2, 2)))
-	model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-	model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-	model.add(MaxPooling2D((2, 2)))
-	model.add(Flatten())
-	model.add(Dense(128, activation='relu', kernel_initializer='he_uniform'))
-	model.add(Dense(num_classes, activation='softmax'))
-	# compile model
-	opt = optimizers.SGD(lr=0.01, momentum=0.9)
-	model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
-	return model
+    model = Sequential()
+    
+    #First Convolutional layer
+    model.add(Conv2D(filters = 56, kernel_size = (3,3), activation = 'relu', input_shape = input_shape))
+    model.add(MaxPooling2D(pool_size = (2,2)))
+
+    #second Convolutional layer
+    model.add(Conv2D(32,(3,3), activation = 'relu'))
+    model.add(MaxPooling2D(pool_size = (2,2)))
+
+    #Flattening
+    model.add(Flatten())
+
+    #Hidden Layer
+    model.add(Dense(units = 64, activation = 'relu'))
+
+    #Output Layer
+    model.add(Dense(num_classes, activation = 'softmax'))
+
+    model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+    return model
+
+def myNet3(input_shape, num_classes):
+    model = Sequential()
+    model.add(Conv2D(64, (3, 3), padding='same', input_shape = input_shape))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(Conv2D(64, (3, 3)))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+
+    model.add(Conv2D(128, (3, 3), padding='same'))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(Conv2D(128, (3, 3)))
+    model.add(Activation('relu'))
+    model.add(BatchNormalization())
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+
+    model.add(Flatten())
+    model.add(Dense(512, kernel_regularizer=regularizers.l2(0.01)))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.25))
+    model.add(Dense(num_classes))
+    model.add(Activation('softmax'))
+
+    model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+    return model
 
 def alexNet(input_shape, num_classes, regl2 = 0.0001, lr = 0.0001):
 
@@ -259,11 +317,97 @@ def train(net):
     steps_per_epoch = train_generator.n//train_generator.batch_size
     val_steps = test_generator.n//test_generator.batch_size + 1
 
-    history = model.fit_generator(train_generator, epochs = 3, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
+    history = model.fit_generator(train_generator, epochs = 50, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
     end_time = time.time()
     print("Time elapsed: " + str(end_time - start_time))
     saveModel(model, model_name)
     plotHistory(history, net)
+'''
+def transferLearning():
+    model_name = "transfer_weather"
+    train_generator, test_generator = loadData()
+    steps_per_epoch = train_generator.n//train_generator.batch_size
+    val_steps = test_generator.n//test_generator.batch_size + 1
+
+    start_time = time.time()
+
+    # load the pre-trained model
+    # define input tensor
+    input0 = Input(shape = train_generator.image_shape)
+
+    # load a pretrained model on imagenet without the final dense layer
+    feature_extractor = applications.vgg16.VGG16(include_top=False, weights='imagenet', input_tensor=input0)
+    
+    
+    feature_extractor = feature_extractor.output
+    feature_extractor = Model(input=input0, output=feature_extractor)
+    optimizer = 'adam' #alternative 'SGD'
+
+    feature_extractor.compile(loss=keras.losses.categorical_crossentropy, optimizer=optimizer, metrics=['accuracy'])
+    feature_extractor.summary()
+
+
+    # choose the layer from which you can get the features (block5_pool the end, glob_pooling to get the pooled version of the output)
+    name_output_extractor = "block5_pool"
+    trainable_layers = ["block5_conv3"]
+
+    # build the transfer model
+    # get the original input layer tensor
+    input_t = feature_extractor.get_layer(index=0).input
+
+    # set the feture extractor layers as non-trainable
+    for idx,layer in enumerate(feature_extractor.layers):
+        if layer.name in trainable_layers:
+            layer.trainable = True
+        else:
+            layer.trainable = False
+
+    # get the output tensor from a layer of the feature extractor
+    output_extractor = feature_extractor.get_layer(name = name_output_extractor).output
+    
+    #output_extractor = MaxPooling2D(pool_size=(4,4))(output_extractor)
+
+    # flat the output of a Conv layer
+    flatten = Flatten()(output_extractor) 
+    flatten_norm = BatchNormalization()(flatten)
+
+    # add a Dense layer
+    dense = Dropout(0.4)(flatten_norm)
+    dense = Dense(200, activation='relu')(dense)
+    dense = BatchNormalization()(dense)
+    
+    # add a Dense layer
+    dense = Dropout(0.4)(dense)
+    dense = Dense(100, activation='relu')(dense)
+    dense = BatchNormalization()(dense)
+
+    # add the final output layer
+    dense = BatchNormalization()(dense)
+    dense = Dense(train_generator.num_classes, activation='softmax')(dense)
+    
+
+    model = Model(input=input_t, output=dense, name="transferNet")
+    
+    optimizer = 'adam' #alternative 'SGD'
+    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=optimizer, metrics=['accuracy'])
+    model.summary()
+
+    # fit the transferNet on the training data
+    stopping = callbacks.EarlyStopping(monitor='val_acc', patience=3)
+
+    steps_per_epoch = train_generator.n//train_generator.batch_size
+    val_steps = test_generator.n//test_generator.batch_size+1
+
+
+    history_transfer = model.fit_generator(train_generator, epochs=50, verbose=1, callbacks=[stopping],\
+                    steps_per_epoch=steps_per_epoch,\
+                    validation_data=test_generator,\
+                    validation_steps=val_steps)
+
+    end_time = time.time()
+    print("Time elapsed: " + str(end_time - start_time))
+    plotHistory(history_transfer, "transferNet")
+    saveModel(model, model_name)'''
 
 def transferLearning():
     model_name = "transfer_weather"
@@ -273,51 +417,62 @@ def transferLearning():
 
     start_time = time.time()
 
-    # load model
-    transfer_model = applications.vgg16.VGG16(include_top = False, input_shape = train_generator.image_shape)
-	# mark loaded layers as not trainable
-    for layer in transfer_model.layers:
+    model_vgg = applications.vgg16.VGG16(weights="imagenet", include_top=False, input_shape = train_generator.image_shape)
+ 
+    # Freeze the layers except the last 9 layers
+    for layer in model_vgg.layers[:-9]:
         layer.trainable = False
-	# allow last vgg block to be trainable
-    transfer_model.get_layer('block5_conv1').trainable = True
-    transfer_model.get_layer('block5_conv2').trainable = True
-    transfer_model.get_layer('block5_conv3').trainable = True
-    transfer_model.get_layer('block5_pool').trainable = True
-	# add new classifier layers
-    flat1 = Flatten()(transfer_model.layers[-1].output)
-    class1 = Dense(128, activation='relu', kernel_initializer='he_uniform')(flat1)
-    output = Dense(train_generator.num_classes, activation='softmax')(class1)
-	# define new model
-    transfer_model = Model(inputs = transfer_model.inputs, outputs = output)
-    # compile model
-    opt = optimizers.SGD(lr=0.01, momentum=0.9)
-    transfer_model.compile(optimizer = opt, loss = 'categorical_crossentropy', metrics = ['accuracy'])
     
-    history_transfer = transfer_model.fit_generator(train_generator, epochs = 100, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
+    # Check the trainable status of the individual layers
+    for layer in model_vgg.layers:
+        print(layer, layer.trainable)
+
+    model_transfer = Sequential()
+    model_transfer.add(model_vgg)
+    model_transfer.add(GlobalAveragePooling2D())
+    model_transfer.add(Dropout(0.2))
+    model_transfer.add(Dense(100, activation='relu'))
+    model_transfer.add(Dense(train_generator.num_classes, activation='softmax'))
+    model_transfer.summary()
+    opt = optimizers.Adam(lr=0.00001)
+    model_transfer.compile(loss='categorical_crossentropy', optimizer=opt,metrics=['accuracy'])
+
+    history_transfer = model_transfer.fit_generator(train_generator, epochs=50, verbose=1, \
+                    steps_per_epoch=steps_per_epoch,\
+                    validation_data=test_generator,\
+                    validation_steps=val_steps)
+
     end_time = time.time()
     print("Time elapsed: " + str(end_time - start_time))
     plotHistory(history_transfer, "transferNet")
-    saveModel(transfer_model, model_name)
+    saveModel(model_transfer, model_name)
 
 def test(net):
-    train_generator, test_generator = loadData()
+    datagen = ImageDataGenerator(rescale = 1. / 255)
+    test_generator = datagen.flow_from_directory(directory = testset,
+        target_size = (height, width),
+        color_mode = "rgb",
+        batch_size = batch_size,
+        class_mode = "categorical",
+        shuffle = True,
+        subset = "validation")
     model_name = "%s_weather" % net
     model = loadModel(model_name)
     if model == None:
         print("Model doesn't exist!")
         exit(1)
-    classnames = [k for k,v in train_generator.class_indices.items()]
+    classnames = [k for k,v in test_generator.class_indices.items()]
     evaluateModel(model, test_generator, classnames)
 
 def blindPredict(net):
-    test_generator = test_datagen.flow_from_directory(directory = testset)
-    classnames = [k for k,v in test_generator.class_indices.items()]
+    generator = datagen.flow_from_directory(directory = trainingset)
+    classnames = [k for k,v in generator.class_indices.items()]
 
     print("Loading blindset images")
     images = []
     for image_name in os.listdir(blindset):
         img = cv2.imread(os.path.join(blindset, image_name))
-        img = cv2.resize(img, (224, 118))
+        img = cv2.resize(img, (width, height))
         if img is not None:
             images.append(img)
 
@@ -352,7 +507,8 @@ if __name__ == "__main__":
     nets = {
         "alexnet": alexNet,
         "mynet": myNet,
-        "mynet2": myNet2
+        "mynet2": myNet2,
+        "mynet3": myNet3
     }
 
     parser = argparse.ArgumentParser(description = 'Weather image classification')
@@ -368,28 +524,31 @@ if __name__ == "__main__":
 
     batch_size = 32
 
-    print("Creating train generator")
-    train_datagen = ImageDataGenerator(
-            rescale = 1. / 255,\
-            zoom_range = 0.1,\
-            rotation_range = 10,\
-            width_shift_range = 0.1,\
-            height_shift_range = 0.1,\
-            horizontal_flip = True,\
-            vertical_flip = False)
-
-    print("Creating test generator")
-    test_datagen = ImageDataGenerator(rescale = 1. / 255)
+    print("Creating dataset generator")
+    datagen = ImageDataGenerator(
+        rescale = 1. / 255, \
+        validation_split = 0.2, \
+        rotation_range = 40, \
+        zoom_range = 0.2, \
+        width_shift_range = 0.2, \
+        height_shift_range = 0.2, \
+        horizontal_flip = True, \
+        vertical_flip = True)
 
     if args.task.lower() == "train":
+        print("Training %s..." % args.net.lower())
         train(args.net.lower())
     elif args.task.lower() == "test":
+        print("Testing %s..." % args.net.lower())
         test(args.net.lower())
     elif args.task.lower() == "blindpredict":
+        print("Blind test predictions with %s..." % args.net.lower())
         blindPredict(args.net.lower())
     elif args.task.lower() == "mydatasetpredict":
+        print("My dataset predictions with %s..." % args.net.lower())
         myDatasetPredict(args.net.lower())
-    else:
+    elif args.task.lower() == "transferlearning":
+        print("Transfer Learning...")
         transferLearning()
 
    
