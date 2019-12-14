@@ -3,6 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # only fatal errors
 import logging
 logging.getLogger('tensorflow').setLevel(logging.FATAL)
 import numpy as np
+import cv2
 import argparse
 import time
 import tensorflow as tf
@@ -23,29 +24,22 @@ config.gpu_options.allow_growth = True # dynamically grow the memory used on the
 sess = tf.compat.v1.Session(config = config)
 set_session(sess) # set this TensorFlow session as the default session for Keras
 
-trainingset = "dataset/train_big/"
+trainingset = "dataset/train/"
 testset = "dataset/test/"
-blindset = "dataset/blind"
+blindset = "dataset/blind/"
 models_dir = "models/"
 
 def loadData():
     train_generator = train_datagen.flow_from_directory(
         directory = trainingset,
-        target_size = (224, 224),
+        target_size = (118, 224),
         color_mode = "rgb",
         batch_size = batch_size,
         class_mode = "categorical",
         shuffle = True
     )
 
-    test_generator = test_datagen.flow_from_directory(
-        directory = testset,
-        target_size = (224, 224),
-        color_mode = "rgb",
-        batch_size = batch_size,
-        class_mode = "categorical",
-        shuffle = False
-    )
+    test_generator = test_datagen.flow_from_directory(directory = testset)
 
     num_samples = train_generator.n
     num_classes = train_generator.num_classes
@@ -110,21 +104,23 @@ def evaluateModel(model, test_generator, classnames):
 def plotHistory(history, name):
 
     # summarize history for accuracy
+    plt.figure()
     plt.plot(history.history['accuracy'])
     plt.plot(history.history['val_accuracy'])
     plt.title(name + ' accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    plt.savefig(name + '_accuracy.png')
     # summarize history for loss
+    plt.figure()
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
     plt.title(name + ' loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
+    plt.savefig(name + '_loss.png')
 
 def myNet(input_shape, num_classes):
     model = Sequential()
@@ -146,46 +142,30 @@ def myNet(input_shape, num_classes):
     model.add(Dropout(0.3))
     model.add(Dense(512, activation = 'relu'))
     model.add(Dropout(0.3))
-    model.add(Dense(num_classes, activation='sigmoid'))
+    model.add(Dense(num_classes, activation='softmax'))
 
     model.compile(loss = 'categorical_crossentropy', optimizer = optimizers.RMSprop(lr=1e-4), metrics = ['accuracy'])
 
     return model
 
 def myNet2(input_shape, num_classes):
-    
-    model = Sequential()
-    
-    model.add(Conv2D(12, kernel_size=(11, 11), strides=(2, 2), activation='relu', input_shape=input_shape, padding="same"))
-    model.add(AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
-    model.add(BatchNormalization())
-    
-    model.add(Conv2D(32, kernel_size=(8, 8), strides=(2, 2), activation='relu', padding='valid'))
-    model.add(AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
-    model.add(BatchNormalization())
-    
-    model.add(Conv2D(240, kernel_size=(8, 8), strides=(2, 2), activation='relu', padding='valid'))
-    model.add(AveragePooling2D(pool_size=(2, 2), strides=(2, 2), padding='valid'))
-    model.add(BatchNormalization())
-    
-    model.add(Conv2D(360, kernel_size=(2, 2), strides=(1, 1), activation='relu', padding='valid'))
-    model.add(BatchNormalization())
-    
-    model.add(Flatten())
-    
-    model.add(Dense(2048, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(BatchNormalization())
-    
-    model.add(Dense(512, activation='relu'))
-    model.add(BatchNormalization())
-    
-    model.add(Dense(num_classes, activation='softmax'))
-
-    optimizer = "adam"
-    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=optimizer, metrics=['accuracy'])
-    
-    return model
+	model = Sequential()
+	model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=input_shape))
+	model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+	model.add(MaxPooling2D((2, 2)))
+	model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+	model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+	model.add(MaxPooling2D((2, 2)))
+	model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+	model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+	model.add(MaxPooling2D((2, 2)))
+	model.add(Flatten())
+	model.add(Dense(128, activation='relu', kernel_initializer='he_uniform'))
+	model.add(Dense(num_classes, activation='softmax'))
+	# compile model
+	opt = optimizers.SGD(lr=0.01, momentum=0.9)
+	model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+	return model
 
 def alexNet(input_shape, num_classes, regl2 = 0.0001, lr = 0.0001):
 
@@ -279,14 +259,11 @@ def train(net):
     steps_per_epoch = train_generator.n//train_generator.batch_size
     val_steps = test_generator.n//test_generator.batch_size + 1
 
-    try:
-        history = model.fit_generator(train_generator, epochs = 100, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
-    except KeyboardInterrupt:
-        pass
+    history = model.fit_generator(train_generator, epochs = 3, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
     end_time = time.time()
-    print("Time elapsed: " + str(start_time - end_time))
+    print("Time elapsed: " + str(end_time - start_time))
     saveModel(model, model_name)
-    plotHistory(history, "myNet")
+    plotHistory(history, net)
 
 def transferLearning():
     model_name = "transfer_weather"
@@ -296,65 +273,31 @@ def transferLearning():
 
     start_time = time.time()
 
-    # create the base pre-trained model
-    base_model = applications.vgg16.VGG16(weights = "imagenet", include_top = False, input_tensor = Input(shape = train_generator.image_shape))
-
-    # add a global spatial average pooling layer
-    x = base_model.output
-    x = GlobalAveragePooling2D()(x)
-    # let's add a fully-connected layer
-    x = Dense(1024, activation = 'relu')(x)
-    # and a logistic layer -- let's say we have 200 classes
-    predictions = Dense(train_generator.num_classes, activation='softmax')(x)
-
-    # this is the model we will train
-    transfer_model = Model(inputs = base_model.input, outputs = predictions)
-
-    # first: train only the top layers (which were randomly initialized)
-    # i.e. freeze all convolutional InceptionV3 layers
-    for layer in base_model.layers:
+    # load model
+    transfer_model = applications.vgg16.VGG16(include_top = False, input_shape = train_generator.image_shape)
+	# mark loaded layers as not trainable
+    for layer in transfer_model.layers:
         layer.trainable = False
-
-    # compile the model (should be done *after* setting layers to non-trainable)
-    transfer_model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics = ['accuracy'])
-
-    # train the model on the new data for a few epochs
-    try:
-        history_transfer = transfer_model.fit_generator(train_generator, epochs = 5, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
-    except KeyboardInterrupt:
-        pass
-
-    # at this point, the top layers are well trained and we can start fine-tuning
-    # convolutional layers from inception V3. We will freeze the bottom N layers
-    # and train the remaining top layers.
-    '''
-    # let's visualize layer names and layer indices to see how many layers
-    # we should freeze:
-    for i, layer in enumerate(base_model.layers):
-        print(i, layer.name)'''
-
-    # we chose to train the top 2 layers, i.e. we will freeze
-    # the first 18 layers and unfreeze the rest:
-    for layer in transfer_model.layers[:18]:
-        layer.trainable = False
-    for layer in transfer_model.layers[18:]:
-        layer.trainable = True
-
-    # we need to recompile the model for these modifications to take effect
-    # we use SGD with a low learning rate
-    from keras.optimizers import SGD
-    transfer_model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy', metrics = ['accuracy'])
-
-    # we train our model again (this time fine-tuning the top 2 vgg16 blocks
-    # alongside the top Dense layers
-    try:
-        history_transfer = transfer_model.fit_generator(train_generator, epochs = 95, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
-    except KeyboardInterrupt:
-        pass
+	# allow last vgg block to be trainable
+    transfer_model.get_layer('block5_conv1').trainable = True
+    transfer_model.get_layer('block5_conv2').trainable = True
+    transfer_model.get_layer('block5_conv3').trainable = True
+    transfer_model.get_layer('block5_pool').trainable = True
+	# add new classifier layers
+    flat1 = Flatten()(transfer_model.layers[-1].output)
+    class1 = Dense(128, activation='relu', kernel_initializer='he_uniform')(flat1)
+    output = Dense(train_generator.num_classes, activation='softmax')(class1)
+	# define new model
+    transfer_model = Model(inputs = transfer_model.inputs, outputs = output)
+    # compile model
+    opt = optimizers.SGD(lr=0.01, momentum=0.9)
+    transfer_model.compile(optimizer = opt, loss = 'categorical_crossentropy', metrics = ['accuracy'])
+    
+    history_transfer = transfer_model.fit_generator(train_generator, epochs = 100, verbose = 1, steps_per_epoch = steps_per_epoch, validation_data = test_generator, validation_steps = val_steps)
     end_time = time.time()
-    print("Time elapsed: " + str(start_time - end_time))
-    saveModel(transfer_model, model_name)
+    print("Time elapsed: " + str(end_time - start_time))
     plotHistory(history_transfer, "transferNet")
+    saveModel(transfer_model, model_name)
 
 def test(net):
     train_generator, test_generator = loadData()
@@ -366,11 +309,45 @@ def test(net):
     classnames = [k for k,v in train_generator.class_indices.items()]
     evaluateModel(model, test_generator, classnames)
 
+def blindPredict(net):
+    test_generator = test_datagen.flow_from_directory(directory = testset)
+    classnames = [k for k,v in test_generator.class_indices.items()]
+
+    print("Loading blindset images")
+    images = []
+    for image_name in os.listdir(blindset):
+        img = cv2.imread(os.path.join(blindset, image_name))
+        img = cv2.resize(img, (224, 118))
+        if img is not None:
+            images.append(img)
+
+    images = np.array(images, dtype="float") / 255.0
+
+    model_name = "%s_weather" % net
+    model = loadModel(model_name)
+    if model == None:
+        print("Model doesn't exist!")
+        exit(1)
+
+    pred = model.predict_classes(images)
+    pred_labels = [classnames[i] for i in pred]
+    
+    predictions_file = open("blindset_predictions.csv", "w")
+    for label in pred_labels:
+        print(label, file = predictions_file)
+    predictions_file.close()
+    
+
+def myDatasetPredict(net):
+    print("Predict %s" % net)
+
 if __name__ == "__main__":
     tasks = {
         "train": train,
         "test": test,
-        "transferlearning": transferLearning
+        "transferlearning": transferLearning,
+        "blindpredict": blindPredict,
+        "mydatasetpredict": myDatasetPredict
     }
     nets = {
         "alexnet": alexNet,
@@ -408,6 +385,10 @@ if __name__ == "__main__":
         train(args.net.lower())
     elif args.task.lower() == "test":
         test(args.net.lower())
+    elif args.task.lower() == "blindpredict":
+        blindPredict(args.net.lower())
+    elif args.task.lower() == "mydatasetpredict":
+        myDatasetPredict(args.net.lower())
     else:
         transferLearning()
 
