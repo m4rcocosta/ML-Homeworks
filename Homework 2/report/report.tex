@@ -35,12 +35,43 @@
 \pagebreak
 
 \section{Introduction}
+The purpose of this homework is to solve a \textit{multi-class} image classification problem on the \textbf{\textit{Multi-class Weather Image Dataset}}. The problem must be solved using two modes:
+\begin{enumerate}
+	\item Define a CNN and train it from scratch;
+	\item Apply transfer learning and fine tuning from a pre-trained model.
+\end{enumerate}
+After that, we have to evaluate the two models in a proper way. The metrics used for the comparison of the models are the accuracy and the loss function (\textit{Categorical Crossentropy}).
+Finally we have to perform a prediction on the \textbf{\textit{WeatherBlindTestSet}} and create a \textit{.csv} file in wichh there is the predicted label for each image.
+Moreover, we have to provide a personal dataset made with own photos. 
 
 
-\section{Create CNN from scratch}
+\subsection{Dataset}
+The \textbf{\textit{Multi-class Weather Image Dataset}} contains images grouped in four classes: \textbf{HAZE}, \textbf{RAINY}, \textbf{SNOWY}, \textbf{SUNNY}.
+It is very balanced: the whole dataset has 1000 images for each class.
+It is organized in a file system structure with four folders corresponding to the four classes \textit{HAZE}, \textit{RAINY}, \textit{SNOWY}, \textit{SUNNY} and containing the corresponding images.
+In addition, there is the \textbf{\textit{SMART-I weather test set}} that can be used as test set. It contains only the three classes \textit{RAINY}, \textit{SNOWY}, \textit{SUNNY}. 
+Images in the datasets have different shapes and resolutions. It is necessary to reshape these images to make image dimensions consistent with the input layer of the network.
+
+\subsection{Hardware}
+Since we use tensorflow and keras libraries, the performance (training time, prediction, etc.) depends on the hardware, and in particular on the GPU. We used the \textit{Nvidia GeForce GTX 950M}, having 640 \textit{CUDA cores}, 4Gb of \textit{DDR3 Memory} and 1000 MHz of clock.
+
+\section{Define a CNN and train it from scratch}
 \subsection{AlexNet}
 
-\section{Transfer Learning}
+
+\subsection{MyNet v.1}
+
+
+\subsection{MyNet v.2}
+
+
+\subsection{MyNet v.3}
+
+
+\section{Transfer Learning with fine tuning}
+
+
+\section{Results}
 
 
 \section{Conclusions}
