@@ -24,9 +24,9 @@ sess = tf.compat.v1.Session(config = config)
 set_session(sess) # set this TensorFlow session as the default session for Keras
 
 dataset_path = "dataset/"
-trainingset = dataset_path + "MWI-Dataset/"
-testset = dataset_path + "SMART-I_WeatherTestSet/"
-blindset = dataset_path + "WeatherBlindTestSet/"
+trainingset_path = dataset_path + "MWI-Dataset/"
+testset_path = dataset_path + "SMART-I_WeatherTestSet/"
+blindset_path = dataset_path + "WeatherBlindTestSet/"
 kucoDataset_path = dataset_path + "KucoDataset/"
 models_dir = "models/"
 
@@ -36,7 +36,7 @@ epochs = 100
 
 def loadData():
     train_generator = datagen.flow_from_directory(
-        directory = trainingset,
+        directory = trainingset_path,
         target_size = (height, width),
         color_mode = "rgb",
         batch_size = batch_size,
@@ -46,7 +46,7 @@ def loadData():
     )
 
     test_generator = datagen.flow_from_directory(
-        directory = trainingset,
+        directory = trainingset_path,
         target_size = (height, width),
         color_mode = "rgb",
         batch_size = batch_size,
@@ -147,31 +147,24 @@ def plotHistory(history, name):
     plt.ylabel("loss")
     plt.xlabel("epoch")
     plt.legend(["train", "test"], loc = "upper left")
-    plt.savefig("images/" + name + "_%s_loss.png" % epochs)
+    plt.savefig("images/" + name + "_%s_epochs_loss.png" % epochs)
 
 def kucoNet(input_shape, num_classes):
     model = Sequential()
     
-    model.add(Conv2D(16, kernel_size = (3, 3), activation = "relu", input_shape = input_shape))
+    model.add(Conv2D(32, kernel_size = (5, 5), activation = "relu", input_shape = input_shape))
     model.add(MaxPooling2D(pool_size = (2, 2)))
 
     model.add(Conv2D(64, kernel_size = (3, 3), activation = "relu"))
     model.add(MaxPooling2D(pool_size = (2, 2)))
 
-    model.add(Conv2D(128, kernel_size = (3, 3), activation = "relu"))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-
-    model.add(Conv2D(128, kernel_size = (3, 3), activation = "relu"))
-    model.add(MaxPooling2D(pool_size = (2, 2)))
-
     model.add(Flatten())
-    model.add(Dense(512, activation = "relu"))
+    model.add(Dense(1024, activation = "relu"))
     model.add(Dropout(0.3))
-    model.add(Dense(512, activation = "relu"))
-    model.add(Dropout(0.3))
+    
     model.add(Dense(num_classes, activation="softmax"))
 
-    model.compile(loss = "categorical_crossentropy", optimizer = optimizers.RMSprop(lr=1e-4), metrics = ["accuracy"])
+    model.compile(loss = "categorical_crossentropy", optimizer = "adam", metrics = ["accuracy"])
 
     return model
 
@@ -317,7 +310,7 @@ def train(net):
     plotHistory(history, net)
 
 def transferLearning():
-    model_name = "transfer_MWI-Dataset_%s_epochs" % epochs
+    model_name = "transfernet_MWI-Dataset_%s_epochs" % epochs
     train_generator, test_generator = loadData()
     steps_per_epoch = train_generator.n//train_generator.batch_size
     val_steps = test_generator.n//test_generator.batch_size + 1
@@ -354,7 +347,7 @@ def transferLearning():
 
 def test(net):
     datagen = ImageDataGenerator(rescale = 1. / 255)
-    test_generator = datagen.flow_from_directory(directory = testset,
+    test_generator = datagen.flow_from_directory(directory = testset_path,
         target_size = (height, width),
         color_mode = "rgb",
         batch_size = batch_size,
@@ -369,18 +362,18 @@ def test(net):
     evaluateModel(model, test_generator, classnames)
 
 def blindPredict(net):
-    generator = datagen.flow_from_directory(directory = trainingset)
+    generator = datagen.flow_from_directory(directory = trainingset_path)
     classnames = [k for k,v in generator.class_indices.items()]
 
-    print("Loading blindset images")
+    print("Loading blindset_path images")
     image_names = []
-    for image_name in os.listdir(blindset):
+    for image_name in os.listdir(blindset_path):
         image_names.append(image_name)
     image_names.sort() # Images in alphabetical order
 
     images = []
     for image_name in image_names:
-        img = cv2.imread(os.path.join(blindset, image_name))
+        img = cv2.imread(os.path.join(blindset_path, image_name))
         img = cv2.resize(img, (width, height))
         if img is not None:
             images.append(img)
@@ -440,7 +433,7 @@ if __name__ == "__main__":
         "kuconet": kucoNet,
         "kuconet2": kucoNet2,
         "kuconet3": kucoNet3,
-        "transfer": None
+        "transfernet": None
     }
 
     parser = argparse.ArgumentParser(description = "Weather image classification")
@@ -468,7 +461,7 @@ if __name__ == "__main__":
         vertical_flip = True)
 
     if args.task.lower() == "train":
-        if args.net.lower() == "transfer":
+        if args.net.lower() == "transfernet":
             print("Wrong net")
             exit(1)
         print("Training %s..." % args.net.lower())
